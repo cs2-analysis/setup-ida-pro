@@ -109,7 +109,7 @@ async function setup(installPath) {
   await exec.exec('idapyswitch', ['--auto-apply']);
   await exec.exec('pip', ['install', path.join(installPath, 'idalib', 'python')]);
   await exec.exec('python3', [path.join(installPath, 'idalib', 'python', 'py-activate-idalib.py')]);
-  await exec.exec('python3', [path.join(__dirname, '..', 'ida90_eula.py')])
+  await exec.exec('python3', [path.join(__dirname, 'ida90_eula.py')])
 }
 
 async function run() {
