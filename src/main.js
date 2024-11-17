@@ -62,9 +62,9 @@ async function download() {
 
   if (useCloudCache) {
     core.info(`Checking actions cache for ${cacheKey}`);
-    const cacheKey = await cache.restoreCache([outputPath], cacheKey);
-    if (cacheKey) {
-      core.info(`Found in actions cache: ${cacheKey}`);
+    const cacheKeyHit = await cache.restoreCache([outputPath], cacheKey);
+    if (cacheKeyHit) {
+      core.info(`Found in actions cache: ${cacheKeyHit}`);
       core.addPath(outputPath);
       return outputPath;
     } else {
