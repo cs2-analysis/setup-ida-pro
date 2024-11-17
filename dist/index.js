@@ -61841,7 +61841,7 @@ async function download() {
 
   if (useCloudCache) {
     core.info(`Checking actions cache for ${cacheKey}`);
-    const actionCachePaths = await cache.restoreCache([outputPath], actionCacheKey);
+    const actionCachePaths = await cache.restoreCache([outputPath], cacheKey);
     if (actionCachePaths) {
       core.info(`Found in actions cache: ${actionCachePaths}`);
       core.addPath(actionCachePaths);
