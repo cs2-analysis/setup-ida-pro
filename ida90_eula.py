@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import os
-import ida
+import idapro
 import ida_registry
 
 ## Agree to EULA using this simple hack
