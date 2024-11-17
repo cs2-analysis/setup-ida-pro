@@ -16,6 +16,13 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            download-link: DOWNLOAD_LINK_LINUX
+            overlay-links: OVERLAY_LINKS_LINUX
+          - os: windows-latest
+            download-link: DOWNLOAD_LINK_WINDOWS
+            overlay-links: OVERLAY_LINKS_WINDOWS
 
     steps:
     - name: Checkout
@@ -24,8 +31,8 @@ jobs:
     - name: Setup IDA Pro
       uses: ./
       with:
-        download-link: '${{ secrets.DOWNLOAD_LINK }}'
-        overlay-links: '${{ secrets.OVERLAY_LINKS }}'
+        download-link: '${{ secrets[matrix.download-link] }}'
+        overlay-links: '${{ secrets[matrix.overlay-links] }}'
 
     - name: Test IDA Pro
       run: |
