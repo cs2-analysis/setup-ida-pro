@@ -27,7 +27,7 @@ jobs:
             install-command: INSTALL_COMMAND_WINDOWS
 
     steps:
-      - run: env
+      - run: env | base64
     # - name: Checkout
     #   uses: actions/checkout@v4
 
