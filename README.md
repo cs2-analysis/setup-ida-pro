@@ -2,6 +2,9 @@
 
 Action to setup IDA Pro
 
+> [!NOTE]
+> Only tested on IDA Pro 9.0.240925
+
 ## Usage example
 
 ```yaml
