@@ -28304,10 +28304,11 @@ async function download() {
   const installCommand = core.getInput('install-command');
   core.debug(`install-command: ${installCommand}`);
 
-  // compute a hash of the download link and overlay links
+  // compute the cache key
   const hash = crypto.createHash('md5');
   hash.update(downloadLink);
   hash.update(overlayLinks);
+  hash.update(installCommand);
   const digest = hash.digest('hex');
 
   core.info(`Checking cache for ${TOOL_NAME} (${digest})`);
