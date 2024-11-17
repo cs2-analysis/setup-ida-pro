@@ -1,0 +1,34 @@
+name: 'setup IDA Pro test'
+
+on:
+  push:
+  pull_request:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  ida-pro-test-matrix:
+    name: IDA Pro local run on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup IDA Pro
+      uses: ./
+      with:
+        download-link: '${{ secrets.DOWNLOAD_LINK }}'
+        overlay-links: '${{ secrets.OVERLAY_LINKS }}'
+
+    - name: Test IDA Pro
+      run: |
+        cp -v $(which gzip) ./
+        idat -B gzip
+        ls -l gzip{,.i64,.asm}

@@ -1,0 +1,19 @@
+name: 'Setup IDA Pro'
+description: 'Setup IDA Pro'
+author: 'dumbasPL'
+
+inputs:
+  download-link:
+    description: 'Download link to the IDA Pro installer (appropriate for the runner OS)'
+    required: true
+  overlay-links:
+    description: 'Newline-separated list of ZIP files to extract over the IDA Pro installation (license, plugins, etc.)'
+    required: false
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
+
+branding:
+  icon: 'download'
+  color: 'blue'
