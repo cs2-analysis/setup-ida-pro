@@ -44,7 +44,7 @@ async function download() {
   if (cachePath) {
     core.info(`Found in cache: ${cachePath}`);
     core.addPath(cachePath);
-    return;
+    return cachePath;
   } else {
     core.notice(`Not found in cache`);
   }
@@ -82,7 +82,7 @@ async function download() {
     '--prefix', extractPath
   ];
   if (osPlatform === 'windows') {
-    installerArgs.push('--install_python');
+    installerArgs.push('--install_python', 'true');
   }
   await exec.exec(downloadPath, installerArgs);
 
@@ -102,11 +102,20 @@ async function download() {
   core.debug(`newCachePath: ${newCachePath}`);
 
   core.addPath(newCachePath);
+  return newCachePath;
+}
+
+async function setup(path) {
+  await exec.exec('idapyswitch', ['--auto-apply']);
+  await exec.exec('pip', ['install', path.join(path, 'idalib', 'python')]);
+  await exec.exec('python3', [path.join(path, 'idalib', 'python', 'py-activate-idalib.py')]);
+  await exec.exec('python3', [path.join(__dirname, '..', 'ida90_eula.py')])
 }
 
 async function run() {
   try {
-    await download();
+    const path = await download();
+    await setup(path);
     core.info('Successfully installed IDA Pro');
   } catch (error) {
     core.setFailed(error.message);
