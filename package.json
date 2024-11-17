@@ -14,6 +14,7 @@
     "build": "npx ncc build src/index.js -o dist --source-map --license licenses.txt"
   },
   "dependencies": {
+    "@actions/cache": "^3.3.0",
     "@actions/core": "^1.11.1",
     "@actions/exec": "^1.1.1",
     "@actions/io": "^1.1.3",

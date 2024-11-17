@@ -2,11 +2,12 @@ const core = require('@actions/core');
 const exec = require('@actions/exec');
 const io = require("@actions/io");
 const tc = require('@actions/tool-cache');
+const cache = require('@actions/cache');
 const os = require('os');
 const crypto = require('crypto');
 const path = require('path');
 
-const TOOL_NAME = 'IDAPro';
+const TOOL_NAME = 'ida-pro';
 
 function getPlatform() {
   switch (os.platform()) {
@@ -32,6 +33,7 @@ async function download() {
   core.debug(`overlay-links: ${overlayLinkList.join(' ')}`);
   const installCommand = core.getInput('install-command');
   core.debug(`install-command: ${installCommand}`);
+  const useCloudCache = core.getInput('use-cloud-cache') === 'true';
 
   // compute the cache key
   const hash = crypto.createHash('md5');
@@ -39,16 +41,37 @@ async function download() {
   hash.update(overlayLinks);
   hash.update(installCommand);
   const digest = hash.digest('hex');
+  const cacheKey = `${TOOL_NAME}-${osPlatform}-${osArch}-${digest}`;
 
-  core.info(`Checking cache for ${TOOL_NAME} (${digest})`);
-  const cachePath = tc.find(TOOL_NAME, digest);
-  if (cachePath) {
-    core.info(`Found in cache: ${cachePath}`);
-    core.addPath(cachePath);
-    return cachePath;
-  } else {
-    core.notice(`Not found in cache`);
+  if (!useCloudCache) {
+    core.info(`Checking tool cache for ${TOOL_NAME} (${digest})`);
+    const cachePath = tc.find(TOOL_NAME, digest);
+    if (cachePath) {
+      core.info(`Found in tool cache: ${cachePath}`);
+      core.addPath(cachePath);
+      return cachePath;
+    } else {
+      core.info(`Not found in tool cache`);
+    }
   }
+
+  if (!process.env.RUNNER_TEMP)
+    throw new Error('Environment variable RUNNER_TEMP is not set');
+
+  const outputPath = path.join(process.env.RUNNER_TEMP, `${TOOL_NAME}-${digest}`);
+
+  if (useCloudCache) {
+    core.info(`Checking actions cache for ${cacheKey}`);
+    const actionCachePaths = await cache.restoreCache([outputPath], actionCacheKey);
+    if (actionCachePaths) {
+      core.info(`Found in actions cache: ${actionCachePaths}`);
+      core.addPath(actionCachePaths);
+      return actionCachePaths;
+    } else {
+      core.info(`Not found in actions cache`);
+    }
+  }
+  await io.mkdirP(outputPath);
 
   core.info(`Downloading ${TOOL_NAME} from ${downloadLink}`);
   let downloadPath = await tc.downloadTool(downloadLink);
@@ -72,15 +95,11 @@ async function download() {
 
   core.info(`Installing ${downloadPath}`);
 
-  const runnerTemp = process.env.RUNNER_TEMP || os.tmpdir();
-  const extractPath = path.join(runnerTemp, crypto.randomUUID());
-  await io.mkdirP(extractPath);
-
   // run the installer
   const installerArgs = [
     '--mode', 'unattended',
     '--unattendedmodeui', 'none',
-    '--prefix', extractPath
+    '--prefix', outputPath
   ];
   if (osPlatform === 'windows') {
     installerArgs.push('--install_python', 'true');
@@ -90,17 +109,28 @@ async function download() {
   // apply overlays
   for (const overlayPath of overlayPaths) {
     core.info(`Applying overlay ${overlayPath}`);
-    await tc.extractZip(overlayPath, extractPath);
+    await tc.extractZip(overlayPath, outputPath);
   }
 
   if (installCommand) {
     core.info(`Running install command: ${installCommand}`);
-    await exec.exec('bash', ['-c', installCommand], {cwd: extractPath});
+    await exec.exec('bash', ['-c', installCommand], {cwd: outputPath});
   }
 
-  core.info(`Caching ${TOOL_NAME} (${digest})`);
-  const newCachePath = await tc.cacheDir(extractPath, TOOL_NAME, digest);
-  core.debug(`newCachePath: ${newCachePath}`);
+  let newCachePath = outputPath;
+  try {
+    if (!useCloudCache) {
+      core.info(`Caching ${TOOL_NAME} in tool cache (${digest})`);
+      newCachePath = await tc.cacheDir(outputPath, TOOL_NAME, digest);
+      core.debug(`newCachePath: ${newCachePath}`);
+    } else {
+      core.info(`Caching ${TOOL_NAME} in actions cache (${cacheKey})`);
+      const cacheId = await cache.saveCache([outputPath], cacheKey);
+      core.debug(`cacheId: ${cacheId}`);
+    }
+  } catch (error) {
+    core.warning(`Failed to cache ${TOOL_NAME}: ${error.message}`);
+  }
 
   core.addPath(newCachePath);
   return newCachePath;

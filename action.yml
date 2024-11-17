@@ -12,6 +12,10 @@ inputs:
   install-command:
     description: "Additional BASH command to run after extracting the overlay files (if the overlay files don't extract to the correct location)"
     required: false
+  use-cloud-cache:
+    description: 'Use GitHub Actions Cloud Cache instead of tool cache'
+    required: false
+    default: 'true'
 
 runs:
   using: 'node20'

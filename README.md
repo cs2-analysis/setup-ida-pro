@@ -19,6 +19,8 @@ Action to setup IDA Pro and idalib python module
       https://example.com/some/path/some-plugin.zip
     # Additional BASH command to run after extracting the overlay files (if the overlay files don't extract to the correct location)
     install-command: 'mv some-plugin.so plugins'
+    # Use GitHub Actions Cloud Cache instead of tool cache (tool cache is only useful in self-hosted runners, enabled by default)
+    # use-cloud-cache: true
 
 - name: Run IDA Pro in batch mode
   run: idat -B sample.exe
