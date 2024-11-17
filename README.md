@@ -14,4 +14,6 @@ Action to setup IDA Pro
     overlay-links: |
       https://example.com/some/path/license.zip
       https://example.com/some/path/some-plugin.zip
+    # Additional command to run after extracting the overlay files (if the overlay files don't extract to the correct location)
+    install-command: 'mv some-plugin.so plugins'
 ```

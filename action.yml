@@ -9,6 +9,9 @@ inputs:
   overlay-links:
     description: 'Newline-separated list of ZIP files to extract over the IDA Pro installation (license, plugins, etc.)'
     required: false
+  install-command:
+    description: 'Additional command to run after extracting the overlay files'
+    required: false
 
 runs:
   using: 'node20'

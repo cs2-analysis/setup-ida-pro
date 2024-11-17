@@ -20,9 +20,11 @@ jobs:
           - os: ubuntu-latest
             download-link: DOWNLOAD_LINK_LINUX
             overlay-links: OVERLAY_LINKS_LINUX
+            install-command: INSTALL_COMMAND_LINUX
           - os: windows-latest
             download-link: DOWNLOAD_LINK_WINDOWS
             overlay-links: OVERLAY_LINKS_WINDOWS
+            install-command: INSTALL_COMMAND_WINDOWS
 
     steps:
     - name: Checkout
@@ -33,6 +35,7 @@ jobs:
       with:
         download-link: '${{ secrets[matrix.download-link] }}'
         overlay-links: '${{ secrets[matrix.overlay-links] }}'
+        install-command: '${{ secrets[matrix.install-command] }}'
 
     - name: Test IDA Pro
       run: |
