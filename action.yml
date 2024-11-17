@@ -10,7 +10,7 @@ inputs:
     description: 'Newline-separated list of ZIP files to extract over the IDA Pro installation (license, plugins, etc.)'
     required: false
   install-command:
-    description: 'Additional command to run after extracting the overlay files'
+    description: "Additional BASH command to run after extracting the overlay files (if the overlay files don't extract to the correct location)"
     required: false
 
 runs:

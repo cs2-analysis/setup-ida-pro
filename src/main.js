@@ -76,11 +76,15 @@ async function download() {
   await io.mkdirP(extractPath);
 
   // run the installer
-  await exec.exec(downloadPath, [
+  const installerArgs = [
     '--mode', 'unattended',
     '--unattendedmodeui', 'none',
     '--prefix', extractPath
-  ]);
+  ];
+  if (osPlatform === 'windows') {
+    installerArgs.push('--install_python');
+  }
+  await exec.exec(downloadPath, installerArgs);
 
   // apply overlays
   for (const overlayPath of overlayPaths) {
@@ -90,7 +94,7 @@ async function download() {
 
   if (installCommand) {
     core.info(`Running install command: ${installCommand}`);
-    await exec.exec(installCommand, [], {cwd: extractPath});
+    await exec.exec('bash', ['-c', installCommand], {cwd: extractPath});
   }
 
   core.info(`Caching ${TOOL_NAME} (${digest})`);

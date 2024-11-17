@@ -27,19 +27,18 @@ jobs:
             install-command: INSTALL_COMMAND_WINDOWS
 
     steps:
-      - run: env | base64
-    # - name: Checkout
-    #   uses: actions/checkout@v4
+    - name: Checkout
+      uses: actions/checkout@v4
 
-    # - name: Setup IDA Pro
-    #   uses: ./
-    #   with:
-    #     download-link: '${{ secrets[matrix.download-link] }}'
-    #     overlay-links: '${{ secrets[matrix.overlay-links] }}'
-    #     install-command: '${{ secrets[matrix.install-command] }}'
+    - name: Setup IDA Pro
+      uses: ./
+      with:
+        download-link: '${{ secrets[matrix.download-link] }}'
+        overlay-links: '${{ secrets[matrix.overlay-links] }}'
+        install-command: '${{ secrets[matrix.install-command] }}'
 
-    # - name: Test IDA Pro
-    #   run: |
-    #     cp -v $(which gzip) ./
-    #     idat -B gzip
-    #     ls -l gzip{,.i64,.asm}
+    - name: Test IDA Pro
+      run: |
+        cp -v $(which gzip) ./
+        idat -B gzip
+        ls -l gzip{,.i64,.asm}
