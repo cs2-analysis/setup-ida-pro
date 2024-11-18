@@ -2,6 +2,8 @@ name: 'setup IDA Pro test'
 
 on:
   push:
+    branches:
+      - '**'
   pull_request:
 
 defaults:
